@@ -47,6 +47,9 @@ void    sort(t_filename *list, t_HasFlag *hasflag)
                         start->sta = list->sta;
                         list->sta = aa;
                         list->filename = tmp;
+                        tmp = start->link;
+                        start->link = list->link;
+                        list->link = tmp;
                     }
                 }
                 else if ((cmptimespec(&start->sta.st_mtim, &list->sta.st_mtim) < 0 && !hasflag->r) || (cmptimespec(&start->sta.st_mtim, &list->sta.st_mtim) > 0 && hasflag->r))
@@ -57,6 +60,9 @@ void    sort(t_filename *list, t_HasFlag *hasflag)
                     start->sta = list->sta;
                     list->sta = aa;
                     list->filename = tmp;
+                    tmp = start->link;
+                    start->link = list->link;
+                    list->link = tmp;
                 }
             }
             else if ((ft_strncmp(start->filename, list->filename, 255) > 0 && !hasflag->r) || (ft_strncmp(start->filename, list->filename, 255) < 0 && hasflag->r))
@@ -67,6 +73,9 @@ void    sort(t_filename *list, t_HasFlag *hasflag)
                 start->sta = list->sta;
                 list->sta = aa;
                 list->filename = tmp;
+                tmp = start->link;
+                start->link = list->link;
+                list->link = tmp;
             }
             list = list->next;
         }

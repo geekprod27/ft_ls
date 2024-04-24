@@ -26,6 +26,7 @@ typedef struct s_filename
     char *filename;
     int type;   
     struct stat sta;
+    char *link;
     struct s_filename *next;
     int needplus;
 } t_filename;
@@ -47,7 +48,7 @@ void    sort(t_filename *list, t_HasFlag *hasflag);
 void    freelist(t_filename *list);
 void    print_right(t_filename *file, t_max *max, int *flagc, char*dirname);
 void    print_time(t_filename *file);
-void    print_link(t_filename *file, char *dirname);
+void    print_link(t_filename *file);
 void    print_size(t_filename *file, int max);
 void    print_total(t_filename *file, t_HasFlag *hasflag);
 void    print_name_group(t_filename *file, t_max *max);

@@ -38,36 +38,13 @@ void print_name_group(t_filename *file, t_max *max)
     }
 }
 
-void print_link(t_filename *file, char *dirname)
+void print_link(t_filename *file)
 {
-    int flagfree = 0;
-    char *buf = ft_calloc(256, sizeof(char));
-    if(!buf)
-        perror("calloc");
-    char *temp = NULL;
-    if(dirname)
+    if(file->link != NULL)
     {
-        temp = ft_strjoin(dirname, file->filename);
-        flagfree = 1;
+        ft_putstr_fd(" -> ", 1);
+        ft_putstr_fd(file->link, 1);
     }
-    else
-        temp = file->filename;
-    if(readlink(temp, buf, 255) == -1)
-    {
-        char *tmp = ft_strjoin("ft_ls: cannot read symbolic link \'", temp);
-        char *tmp2 = ft_strjoin(tmp, "\'");
-        perror(tmp2);
-        free(tmp);
-        free(tmp2);
-        if(flagfree)
-            free(temp);
-        return ;
-    }
-    ft_putstr_fd(" -> ", 1);
-    ft_putstr_fd(buf, 1);
-    if(flagfree)
-        free(temp);
-    free(buf);
 }
 
 void test(int test, unsigned int st_mode, char c)
