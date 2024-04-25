@@ -102,7 +102,10 @@ void init_max(t_filename *list, t_max *max, t_HasFlag *hasflag, char *dirname)
             if (tmp > max->max_len_link)
                 max->max_len_link = tmp;
             grou = getgrgid(list->sta.st_gid);
-            tmp = ft_strlen(grou->gr_name);
+            if (grou)
+                tmp = ft_strlen(grou->gr_name);
+            else
+                tmp = get_len_nbr(list->sta.st_gid);
             if (tmp > max->max_group)
                 max->max_group = tmp;
             infouser = getpwuid(list->sta.st_uid);

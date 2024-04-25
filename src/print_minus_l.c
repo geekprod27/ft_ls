@@ -28,13 +28,27 @@ void print_name_group(t_filename *file, t_max *max)
 
 
     struct group *grou = getgrgid(file->sta.st_gid);
-    ft_putstr_fd(grou->gr_name, 1);
-    ft_putchar_fd(' ', 1);
-    len = ft_strlen(grou->gr_name);
-    while(len < max->max_group)
+    if (!grou)
     {
+        len = get_len_nbr(file->sta.st_gid);
+        while(len < max->max_group)
+        {
+            ft_putchar_fd(' ', 1);
+            len++;
+        }
+        ft_putnbr_fd(file->sta.st_gid, 1);
         ft_putchar_fd(' ', 1);
-        len++;
+    }
+    else
+    {
+        ft_putstr_fd(grou->gr_name, 1);
+        ft_putchar_fd(' ', 1);
+        len = ft_strlen(grou->gr_name);
+        while(len < max->max_group)
+        {
+            ft_putchar_fd(' ', 1);
+            len++;
+        }
     }
 }
 
@@ -154,6 +168,22 @@ void print_major(t_filename *file, int max)
     ft_putchar_fd(' ', 1);
 }
 
+void	ft_putofft_fd(off_t nb, int fd)
+{
+	if (nb < 0)
+	{
+		ft_putchar_fd('-', fd);
+		nb = -nb;
+	}
+	if (nb > 9)
+	{
+		ft_putofft_fd(nb / 10, fd);
+		ft_putchar_fd(nb % 10 + 48, fd);
+	}
+	else
+		ft_putchar_fd(nb + 48, fd);
+}
+
 void print_size(t_filename *file, int max)
 {
     int len;
@@ -169,6 +199,8 @@ void print_size(t_filename *file, int max)
     if(S_ISCHR(file->sta.st_mode) || S_ISBLK(file->sta.st_mode))
         ft_putnbr_fd(minor(file->sta.st_rdev), 1);
     else
-        ft_putnbr_fd(file->sta.st_size, 1);
+    {
+        ft_putofft_fd(file->sta.st_size, 1);
+    }
     ft_putchar_fd(' ', 1);
 }
