@@ -6,7 +6,7 @@ void printfilename(t_filename *file, int i, t_HasFlag *HasFlag, t_max *max, char
     if(!HasFlag->l)
     {
         if (i != 0)
-            write(1, "  ", 2);
+            ft_putstr_fd("  ", 1);
         ft_putstr_fd(file->filename, 1);
     }
     else
@@ -43,6 +43,8 @@ void ls_dir(char *name, t_HasFlag *hasflag, int isfirst)
         perror(tmp2);
         free(tmp);
         free(tmp2);
+        if(flagfree)
+            free(name);
         return ;
     }
     if(isfirst == 0)
@@ -105,7 +107,7 @@ void ls_dir(char *name, t_HasFlag *hasflag, int isfirst)
         if (hasflag->R)
         {
             write(1, name, ft_strlen(name)-1);
-            write(1, ":", 1);
+            ft_putchar_fd(':', 1);
         }
         while(1)
         {
@@ -126,12 +128,15 @@ void ls_dir(char *name, t_HasFlag *hasflag, int isfirst)
                     perror("strjoin2");
                 if(lstat(temp, &list->sta) == -1)
                     perror("stat2");
-                char *buf = ft_calloc(256, sizeof(char));
-                if(!buf)
-                    perror("calloc");
                 
                 if(S_ISLNK(list->sta.st_mode))
                 {
+                    char *buf = ft_calloc(256, sizeof(char));
+                    if(!buf)
+                    {
+                        perror("calloc");
+                        return ;
+                    }
                     if(readlink(temp, buf, 255) == -1)
                     {
                         char *tmp = ft_strjoin("ft_ls: cannot read symbolic link \'", temp);
@@ -205,7 +210,7 @@ void ls_dir(char *name, t_HasFlag *hasflag, int isfirst)
             }
         }
         else if (!hasflag->l && i) {
-            write(1, "\n", 1);
+            ft_putchar_fd('\n', 1);
         }
         if(flagfree)
             free(name);
@@ -225,11 +230,11 @@ t_filename *add_back(t_filename *file, char*name)
         file->filename = ft_strdup(name);
         if(lstat(name, &file->sta) == -1)
             perror("addbackstat");
-        char *buf = ft_calloc(256, sizeof(char));
-        if(!buf)
-            perror("calloc");
         if(S_ISLNK(file->sta.st_mode))
         {
+            char *buf = ft_calloc(256, sizeof(char));
+            if(!buf)
+                perror("calloc");
             if(readlink(name, buf, 255) == -1)
             {
                 char *tmp = ft_strjoin("ft_ls: cannot read symbolic link \'", name);

@@ -7,6 +7,8 @@ void freelist(t_filename *list)
     while(list)
     {
         tmp = list;
+        if (tmp->link)
+            free(tmp->link);
         free(tmp->filename);
         list = list->next;
         free(tmp);

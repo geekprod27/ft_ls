@@ -37,7 +37,7 @@ ${LIBFT}:
 
 ${OBJ_PATH}%.o:${SRC_PATH}%.c
 	@echo -n "\e[2K\r- \33[1;34m$<\33[0m [${PROGRESS}]"
-	@gcc -g3 -Wall -Wextra -c $< -o $@
+	@gcc -O3 -Wall -Wextra -c $< -o $@
 	@echo -n "\e[2K\r- \33[1;32m$<\33[0m [${CHECK}]\n"
 
 ${OBJ_DIRS}:
@@ -45,7 +45,7 @@ ${OBJ_DIRS}:
 
 ${NAME}:${OBJ_DIRS} ${OBJ} ${LIBFT}
 	@echo -n "\e[2K\r- Build \33[1;33m${NAME}\33[0m [${PROGRESS}]"
-	@gcc ${OBJ} -o ${NAME} ${LIBFT}
+	@gcc -O3 ${OBJ} -o ${NAME} ${LIBFT}
 	@echo -n "\e[2K\r- Build \33[1;32m${NAME}\33[0m [${CHECK}]\n"
 
 

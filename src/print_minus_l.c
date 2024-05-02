@@ -17,38 +17,57 @@ void print_total(t_filename *file, t_HasFlag *hasflag)
 void print_name_group(t_filename *file, t_max *max)
 {
     struct passwd *infouser = getpwuid(file->sta.st_uid);
-    ft_putstr_fd(infouser->pw_name, 1);
-    ft_putchar_fd(' ', 1);
-    int len = ft_strlen(infouser->pw_name);
-    while(len < max->max_name)
+    int len = 0;
+    char *toprint = ft_calloc(max->max_name + max->max_group + 10, sizeof(char));
+    while(infouser->pw_name[len])
     {
-        ft_putchar_fd(' ', 1);
+        toprint[len] = infouser->pw_name[len];
         len++;
     }
-
-
+    toprint[len] = ' ';
+    len++;
+    while(len < max->max_name)
+    {
+        toprint[len] = ' ';
+        len++;
+    }
+    int savelen = len;
     struct group *grou = getgrgid(file->sta.st_gid);
     if (!grou)
     {
         len = get_len_nbr(file->sta.st_gid);
         while(len < max->max_group)
         {
-            ft_putchar_fd(' ', 1);
+            toprint[savelen] = ' ';
+            savelen++;
             len++;
         }
+        ft_putstr_fd(toprint, 1);
+        free(toprint);
         ft_putnbr_fd(file->sta.st_gid, 1);
         ft_putchar_fd(' ', 1);
     }
     else
     {
-        ft_putstr_fd(grou->gr_name, 1);
-        ft_putchar_fd(' ', 1);
+        int igr = 0;
+        while(grou->gr_name[igr])
+        {
+            toprint[savelen] = grou->gr_name[igr];
+            igr++;
+            savelen++;
+        }
+        toprint[savelen] = ' ';
+        savelen++;
         len = ft_strlen(grou->gr_name);
         while(len < max->max_group)
         {
-            ft_putchar_fd(' ', 1);
+            toprint[savelen] = ' ';
+            savelen++;
             len++;
         }
+        toprint[savelen] = 0;
+        ft_putstr_fd(toprint, 1);
+        free(toprint);
     }
 }
 
@@ -61,24 +80,24 @@ void print_link(t_filename *file)
     }
 }
 
-void test(int test, unsigned int st_mode, char c)
+char test(int test, unsigned int st_mode, char c)
 {
     if(test & st_mode)
-        ft_putchar_fd(c, 1);
+        return (c);
     else
-        ft_putchar_fd('-', 1);
+        return('-');
 }
 
-void testplus(int test,int testplus, unsigned int st_mode, char c)
+char testplus(int test,int testplus, unsigned int st_mode, char c)
 {
     if(test & st_mode && testplus & st_mode)
-        ft_putchar_fd(c, 1);
+        return(c);
     else if (!(test & st_mode) && testplus & st_mode)
-        ft_putchar_fd(c-32, 1);
+        return(c-32);
     else if (test & st_mode && !(testplus & st_mode))
-        ft_putchar_fd('x', 1);
+        return('x');
     else
-        ft_putchar_fd('-', 1);
+        return('-');
 }
 
 void print_time(t_filename *file)
@@ -105,44 +124,55 @@ void print_time(t_filename *file)
 
 void print_right(t_filename *file, t_max *max, int *flagc, char*dirname)
 {
-
+    char *toprint = ft_calloc(40, sizeof(char));
     if (S_ISDIR(file->sta.st_mode))
-        ft_putchar_fd('d', 1);
+        toprint[0] = 'd';
     else if (S_ISLNK(file->sta.st_mode))
-        ft_putchar_fd('l', 1);
+        toprint[0] = 'l';
     else if(S_ISSOCK(file->sta.st_mode))
-        ft_putchar_fd('s', 1);
+        toprint[0] = 's';
     else if (S_ISFIFO(file->sta.st_mode))
-        ft_putchar_fd('p', 1);
+        toprint[0] = 'p';
     else if (S_ISCHR(file->sta.st_mode))
     {
         *flagc = 1;
-        ft_putchar_fd('c', 1);
+        toprint[0] = 'c';
     }
     else if (S_ISBLK(file->sta.st_mode))
-        ft_putchar_fd('b', 1);
+        toprint[0] = 'b';
     else
-        ft_putchar_fd('-', 1);
-    test(S_IRUSR, file->sta.st_mode, 'r');
-    test(S_IWUSR, file->sta.st_mode, 'w');
-    testplus(S_IXUSR, S_ISGID, file->sta.st_mode, 's');
-    test(S_IRGRP, file->sta.st_mode, 'r');
-    test(S_IWGRP, file->sta.st_mode, 'w');
-    testplus(S_IXGRP, S_ISGID, file->sta.st_mode, 's'); // -> si S_ISGID -> 's'
-    test(S_IROTH, file->sta.st_mode, 'r');
-    test(S_IWOTH, file->sta.st_mode, 'w');
-    testplus(S_IXOTH, S_ISVTX, file->sta.st_mode, 't'); // -> si S_ISVTX -> 't' si pas les 2 maj
+        toprint[0] = '-';
+    toprint[1] = test(S_IRUSR, file->sta.st_mode, 'r');
+    toprint[2] = test(S_IWUSR, file->sta.st_mode, 'w');
+    toprint[3] = testplus(S_IXUSR, S_ISGID, file->sta.st_mode, 's');
+    toprint[4] = test(S_IRGRP, file->sta.st_mode, 'r');
+    toprint[5] = test(S_IWGRP, file->sta.st_mode, 'w');
+    toprint[6] = testplus(S_IXGRP, S_ISGID, file->sta.st_mode, 's');
+    toprint[7] = test(S_IROTH, file->sta.st_mode, 'r');
+    toprint[8] = test(S_IWOTH, file->sta.st_mode, 'w');
+    toprint[9] = testplus(S_IXOTH, S_ISVTX, file->sta.st_mode, 't');
+    int i = 10;
     if(file->needplus)
-        ft_putchar_fd('+', 1);
+    {
+        toprint[i] = '+';
+        i++;
+    }
     else if (max->hasplus)
-        ft_putchar_fd(' ', 1);
-    ft_putchar_fd(' ', 1);
+    {
+        toprint[i] =' ';
+        i++;
+    }
+    toprint[i] =' ';
+    i++;
     int len = get_len_nbr(file->sta.st_nlink);
     while(len < max->max_len_link)
     {
-        ft_putchar_fd(' ', 1);
+        toprint[i] =' ';
+        i++;
         len++;
     }
+    ft_putstr_fd(toprint, 1);
+    free(toprint);
     ft_putnbr_fd(file->sta.st_nlink, 1);
     ft_putchar_fd(' ', 1);
     (void) dirname;
