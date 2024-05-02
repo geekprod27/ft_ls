@@ -19,6 +19,11 @@ void print_name_group(t_filename *file, t_max *max)
     struct passwd *infouser = getpwuid(file->sta.st_uid);
     int len = 0;
     char *toprint = ft_calloc(max->max_name + max->max_group + 10, sizeof(char));
+    if (!toprint)
+    {
+        perror("ft_calloc");
+        return ;
+    }
     while(infouser->pw_name[len])
     {
         toprint[len] = infouser->pw_name[len];

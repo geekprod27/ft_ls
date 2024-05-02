@@ -75,7 +75,10 @@ void ls_dir(char *name, t_HasFlag *hasflag, int isfirst)
     {
         list = malloc(sizeof(t_filename));
         if (!list)
+        {
             perror("malloc list");
+            return ;
+        }
         savestart = list;
         char *temp;
         list->filename = ft_strdup(d->d_name);
@@ -88,7 +91,10 @@ void ls_dir(char *name, t_HasFlag *hasflag, int isfirst)
         {
             char *buf = ft_calloc(256, sizeof(char));
             if(!buf)
+            {
                 perror("calloc");
+                return ;
+            }
             if(readlink(temp, buf, 255) == -1)
             {
                 char *tmp = ft_strjoin("ft_ls: cannot read symbolic link \'", temp);
@@ -106,7 +112,9 @@ void ls_dir(char *name, t_HasFlag *hasflag, int isfirst)
         list->next =NULL;
         if (hasflag->R)
         {
-            write(1, name, ft_strlen(name)-1);
+
+            int antiwarn = write(1, name, ft_strlen(name)-1);
+            antiwarn++;
             ft_putchar_fd(':', 1);
         }
         while(1)
@@ -119,13 +127,19 @@ void ls_dir(char *name, t_HasFlag *hasflag, int isfirst)
             {
                 list->next =malloc(sizeof(t_filename));
                 if(!list->next)
+                {
                     perror("malloc list->next");
+                    return ;
+                }
                 list = list->next;
                 list->filename = ft_strdup(d->d_name);
                 list->needplus = 0;
                 temp = ft_strjoin(name, d->d_name);
                 if (!temp)
+                {
                     perror("strjoin2");
+                    return ;
+                }
                 if(lstat(temp, &list->sta) == -1)
                     perror("stat2");
                 
@@ -172,7 +186,8 @@ void ls_dir(char *name, t_HasFlag *hasflag, int isfirst)
             }
             print_total(savestart, hasflag);
         }
-        sort(savestart, hasflag);
+        if (!hasflag->u)
+            sort(savestart, hasflag);
         list = savestart;
         int i = 0;
         t_max max;
@@ -202,7 +217,10 @@ void ls_dir(char *name, t_HasFlag *hasflag, int isfirst)
                 {
                     char *tt = ft_strjoin(name, list->filename);
                     if(!tt)
+                    {
                         perror("strjoin");
+                        return ;
+                    }
                     ls_dir(tt, hasflag, 0);
                     free(tt);
                 }
@@ -226,7 +244,10 @@ t_filename *add_back(t_filename *file, char*name)
     {
         file = malloc(sizeof(t_filename));
         if(!file)
+        {
             perror("addback");
+            return (NULL);
+        }
         file->filename = ft_strdup(name);
         if(lstat(name, &file->sta) == -1)
             perror("addbackstat");
@@ -234,7 +255,10 @@ t_filename *add_back(t_filename *file, char*name)
         {
             char *buf = ft_calloc(256, sizeof(char));
             if(!buf)
+            {
                 perror("calloc");
+                return (NULL);
+            }
             if(readlink(name, buf, 255) == -1)
             {
                 char *tmp = ft_strjoin("ft_ls: cannot read symbolic link \'", name);
@@ -255,7 +279,10 @@ t_filename *add_back(t_filename *file, char*name)
         file = file->next;
     file->next =malloc(sizeof(t_filename));
     if(!file->next)
+    {
         perror("mallocaddback");
+        return (NULL);
+    }
     file = file->next;
     file->filename = ft_strdup(name);
     file->next = NULL;
@@ -271,6 +298,7 @@ int main(int argc, char**argv)
     hasflag.R = 0;
     hasflag.r = 0;
     hasflag.t = 0;
+    hasflag.u = 0;
     hasflag.others = 0;
     t_filename *rep = NULL;
     t_filename *fichier = NULL;
@@ -298,9 +326,15 @@ int main(int argc, char**argv)
                     if (S_ISDIR(sta.st_mode) || S_ISLNK(sta.st_mode))
                     {
                         rep = add_back(rep, argv[i]);
+                        if (!rep)
+                            return (1);
                     }
                     else
+                    {
                         fichier = add_back(fichier, argv[i]);
+                        if (!fichier)
+                            return (1);
+                    }
                 }
             }
             i++;
@@ -311,7 +345,8 @@ int main(int argc, char**argv)
         if(fichier)
         {
             save = fichier;
-            sort(fichier, &hasflag);
+            if (!hasflag.u)
+                sort(fichier, &hasflag);
             int i = 0;
             while (fichier)
             {
@@ -326,7 +361,8 @@ int main(int argc, char**argv)
         if(rep)
         {
             save = rep;
-            sort(rep, &hasflag);
+            if (!hasflag.u)
+                sort(rep, &hasflag);
             while(rep)
             {
                 if(nbfile > 1 && !hasflag.R)

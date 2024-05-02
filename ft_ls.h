@@ -18,6 +18,7 @@ typedef struct s_HasFlag
     int a;
     int t;
     int r;
+    int u;
     int others;
 }t_HasFlag;
 

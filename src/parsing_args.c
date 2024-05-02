@@ -29,6 +29,9 @@ void parsing(char **av, t_HasFlag *HasFlag)
                 case 'l':
                     HasFlag->l = 1;
                     break;
+                case 'u':
+                    HasFlag->u = 1;
+                    break;
                 default:
                     ft_putstr_fd("invalid flag\n", 2);
                     exit(2);
